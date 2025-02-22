@@ -70,7 +70,7 @@ const QuestionnaireDetail = () => {
 
         <div className="flex justify-between mt-4">
           <button
-            className="bg-teal-500 hover:bg-teal-700 border-teal-500 hover:border-teal-700 text-white py-2 px-4 rounded font-semibold"
+            className="bg-teal-500 hover:bg-teal-700 border-teal-500 hover:border-teal-700  py-2 px-4 rounded font-semibold"
             type="submit"
           >
              Add

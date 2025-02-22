@@ -30,7 +30,7 @@ const QuestionnaireForm = ({ onSubmit }) => {
         className="border p-2 w-full mb-2 rounded"
         required
       ></textarea>
-      <button type="submit" className="bg-blue-500 text-white p-2 w-full rounded">
+      <button type="submit" className="bg-blue-500  p-2 w-full rounded">
         Submit
       </button>
     </form>
