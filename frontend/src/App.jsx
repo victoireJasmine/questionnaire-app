@@ -1,11 +1,17 @@
-import QuestionnairePage from './pages/QuestionnairePage';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Home from "./pages/Home";
+import QuestionnaireDetail from "./pages/QuestionnaireDetail";
+import QuestionnairePage from "./pages/QuestionnairePage";
 
 function App() {
   return (
-    <div>
-      <h1>Create Questionnaire</h1>
-      <QuestionnairePage />
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/questionnaire/:id" element={<QuestionnaireDetail />} />
+        <Route path="/create" element={<QuestionnairePage />} />
+      </Routes>
+    </Router>
   );
 }
 
