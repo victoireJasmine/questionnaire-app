@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createQuestionnaire } from "../services/api";
 import InputField from "../components/InputField";
-import LinkButton from "../components/LinkButton";
+import { Link } from "react-router-dom";
 
 const QuestionnairePage = () => {
   const [title, setTitle] = useState("");
@@ -25,8 +25,15 @@ const QuestionnairePage = () => {
   };
 
   return (
-    <div className="w-full  p-6 bg-gray-50 ">
-      <h1 className="text-2xl font-bold text-center mb-6 text-gray-800">Créer un formulaire</h1>
+    <div className="w-full min-h-screen relative flex flex-col items-center justify-center">
+      {/* Bouton retour en haut à gauche */}
+      <Link to="/" className="absolute top-4 left-4 text-gray-600 hover:text-gray-800 text-2xl">
+        ← retour
+      </Link>
+
+      <h1 className="text-2xl font-bold text-center mb-6 text-gray-800">
+        Créer un formulaire
+      </h1>
 
       <form onSubmit={handleSubmit} className="w-full max-w-sm mx-auto">
         <InputField
@@ -45,11 +52,14 @@ const QuestionnairePage = () => {
           onChange={(e) => setDescription(e.target.value)}
         />
 
-        <div className="flex justify-between mt-4">
-          <button className="bg-blue-500  py-2 px-4 rounded font-semibold hover:bg-blue-600" type="submit">
-             Create
+        {/* Bouton Create centré */}
+        <div className="flex justify-center mt-4">
+          <button
+            className="inline-block bg-teal-500 text-white py-3 px-5 rounded-lg shadow-md hover:bg-blue-600 transition"
+            type="submit"
+          >
+            Create
           </button>
-          <LinkButton to="/" label="Cancel" color="gray" />
         </div>
       </form>
     </div>
