@@ -1,0 +1,27 @@
+name: 🚀 Deploy to Scaleway
+
+on:
+  push:
+    branches:
+      - main  
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name:  Cloner le repo
+        uses: actions/checkout@v2
+
+      - name:  Se connecter au serveur et déployer
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SCALEWAY_HOST }}
+          username: ${{ secrets.SCALEWAY_USER }}
+          key: ${{ secrets.SCALEWAY_SSH_KEY }}
+          script: |
+            cd /home/ubuntu/questionnaire-app
+            git pull origin main
+            docker-compose down
+            docker-compose up -d --build
+            
