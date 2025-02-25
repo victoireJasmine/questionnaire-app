@@ -10,6 +10,12 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+app.router.stack.forEach((r) => {
+  if (r.route && r.route.path) {
+    console.log("route chargée:" , r.route.path);
+  }
+});
+
 app.use("/api/questionnaires", require("./routes/questionnaireRoutes"));
 app.use("/api/questionnaires", require("./routes/questionRoutes"));
 
