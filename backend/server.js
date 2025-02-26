@@ -13,9 +13,16 @@ app.use(cors());
 // Définition des routes
 const questionnaireRoutes = require("./routes/questionnaireRoutes");
 const questionRoutes = require("./routes/questionRoutes");
+const adminRoutes = require("./routes/adminRoutes");
 
 app.use("/api/questionnaires", questionnaireRoutes);
 app.use("/api/questionnaires", questionRoutes);
+app.use("/api/questionnaires/admin", adminRoutes);
+
+
+
+
+
 
 // Afficher les routes chargées proprement
 if (app._router) {
