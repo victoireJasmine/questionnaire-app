@@ -37,6 +37,7 @@ jobs:
       - name: Run Backend Integration Tests
         run: |
           cd backend
+          export NODE_ENV=test 
           npm test -- --runInBand --forceExit --detectOpenHandles
 
   # ✅ Test unitaire du frontend (Vitest)
