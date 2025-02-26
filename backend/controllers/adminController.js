@@ -1,6 +1,6 @@
 const Admin = require("../models/Admin");
 const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 
 // Générer un token JWT
 const generateToken = (id) => {
@@ -42,7 +42,7 @@ const loginAdmin = async (req, res) => {
       return res.status(400).json({ message: "Identifiants invalides." });
     }
 
-    const isMatch = await bcrypt.compare(password, admin.password);
+    const isMatch = await bcrypt.compareSync(password, admin.password);
 
     if (!isMatch) {
       return res.status(400).json({ message: "Identifiants invalides." });
