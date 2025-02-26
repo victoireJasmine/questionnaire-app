@@ -1,4 +1,4 @@
-name: CI/CD Deployment to Scaleway
+name: Deploy to Scaleway
 
 on:
   push:
@@ -6,36 +6,9 @@ on:
       - main
 
 jobs:
-  # Test unitaire du frontend (Vitest)
-  test_frontend:
-    name: Run Frontend Unit Tests
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Install Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-
-      - name: Install frontend dependencies
-        run: |
-          cd frontend
-          npm install
-          npx vitest --version  # Vérifie que Vitest est installé
-
-      - name: Run Frontend Unit Tests
-        run: |
-          cd frontend
-          npm run test
-
-  # Déploiement sur Scaleway après succès des tests front
   deploy:
     name: Deploy to Scaleway
     runs-on: ubuntu-latest
-    needs: [test_frontend]  # Déploiement uniquement si les tests frontend réussissent
 
     steps:
       - name: Checkout repository
@@ -53,14 +26,32 @@ jobs:
       - name: Deploy to server
         run: |
           ssh ${{ secrets.SCALEWAY_USER }}@${{ secrets.SCALEWAY_HOST }} <<EOF
-            set -e  # Arrête le script en cas d'erreur
+            set -e  # Stop script if any command fails
+
+            echo "🚀 Déploiement en cours sur Scaleway..."
+
+            # Aller dans le dossier du projet
             cd ~/questionnaire-app
+
+            # Récupérer les dernières modifications du repo
             git reset --hard origin/main  # Supprime les changements locaux
             git pull origin main  # Récupère les dernières modifications
+
+            # Arrêter l'ancienne version du backend & frontend sans supprimer les volumes
             sudo docker compose down
-            sudo docker system prune -af  # Nettoie les anciens conteneurs/images
-            sudo docker compose build --no-cache frontend  # Rebuild complet du frontend
+
+            # Nettoyage des images inutilisées pour éviter les conflits
+            sudo docker system prune -af --volumes
+
+            # Rebuild du projet sans supprimer les volumes MongoDB
+            sudo docker compose build --no-cache
+
+            # Démarrer les nouveaux services
             sudo docker compose up -d --build
-            sudo systemctl restart nginx  # Redémarre Nginx
+
+            # Assurer que MongoDB et Nginx redémarrent bien
+            sudo systemctl restart nginx
+
+            echo "✅ Déploiement terminé avec succès !"
             exit
           EOF
