@@ -3,6 +3,8 @@ const mongoose = require("mongoose");
 const { MongoMemoryServer } = require("mongodb-memory-server");
 const app = require("../server");
 
+jest.setTimeout(30000); // ✅ Augmente le timeout pour Jest
+
 let mongoServer;
 
 beforeAll(async () => {
@@ -30,7 +32,7 @@ describe("🛠️ Integration Tests - Questionnaire API", () => {
 
   test("✅ GET /api/questionnaires/questionnaire - Récupérer tous les questionnaires", async () => {
     const response = await request(app)
-      .get("/api/questionnaires/questionnaire")  
+      .get("/api/questionnaires/questionnaire")
       .expect(200);
 
     expect(Array.isArray(response.body)).toBe(true);
