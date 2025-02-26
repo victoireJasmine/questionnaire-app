@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "jest --runInBand",
-    "test:watch": "jest --watch"
+    "test": "jest --runInBand --forceExit --detectOpenHandles",
+    "test:watch": "jest --watch",
+    "test:ci": "jest --ci --runInBand"
 
   },
   "keywords": [],

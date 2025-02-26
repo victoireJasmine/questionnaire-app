@@ -1,24 +1,36 @@
 const request = require("supertest");
+const mongoose = require("mongoose");
+const { MongoMemoryServer } = require("mongodb-memory-server");
+const app = require("../server");
 
-const API_URL = "https://victoireondelet.site"; 
+let mongoServer;
 
-describe("🔹 TESTS D'INTÉGRATION - API Déployée", () => {
-  test("Créer un questionnaire - POST /api/questionnaires/questionnaire", async () => {
-    const response = await request(API_URL)
-      .post("/api/questionnaires/questionnaire")
-      .send({
-        title: "Test Integration",
-        description: "Test de l'API en production",
-      })
+beforeAll(async () => {
+  mongoServer = await MongoMemoryServer.create();
+  const mongoUri = mongoServer.getUri();
+  await mongoose.connect(mongoUri, { dbName: "test" });
+});
+
+afterAll(async () => {
+  await mongoose.connection.dropDatabase();
+  await mongoose.connection.close();
+  await mongoServer.stop();
+});
+
+describe("🛠️ Integration Tests - Questionnaire API", () => {
+  test("✅ POST /api/questionnaires/questionnaire - Créer un questionnaire", async () => {
+    const response = await request(app)
+      .post("/api/questionnaires/questionnaire")  
+      .send({ title: "Test Questionnaire", description: "Description de test" })
       .expect(201);
 
     expect(response.body).toHaveProperty("_id");
-    expect(response.body.title).toBe("Test Integration");
+    expect(response.body.title).toBe("Test Questionnaire");
   });
 
-  test("Récupérer tous les questionnaires - GET /api/questionnaires/questionnaire", async () => {
-    const response = await request(API_URL)
-      .get("/api/questionnaires/questionnaire")
+  test("✅ GET /api/questionnaires/questionnaire - Récupérer tous les questionnaires", async () => {
+    const response = await request(app)
+      .get("/api/questionnaires/questionnaire")  
       .expect(200);
 
     expect(Array.isArray(response.body)).toBe(true);
