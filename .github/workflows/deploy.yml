@@ -6,8 +6,35 @@ on:
       - main
 
 jobs:
+  # 🚀 Test unitaire du frontend (Vitest)
+  test_frontend:
+    name: Run Frontend Unit Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install frontend dependencies
+        run: |
+          cd frontend
+          npm install
+          npx vitest --version  # Vérifie que Vitest est installé
+
+      - name: Run Frontend Unit Tests
+        run: |
+          cd frontend
+          npm run test
+
+  # 🚀 Déploiement sur Scaleway (uniquement si les tests du frontend passent)
   deploy:
     runs-on: ubuntu-latest
+    needs: [test_frontend]  # Bloque le déploiement si les tests échouent
 
     steps:
       - name: Checkout repository
