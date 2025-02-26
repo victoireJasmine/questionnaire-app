@@ -11,17 +11,25 @@ app.use(express.json());
 app.use(cors());
 
 // Définition des routes
-app.use("/api/questionnaires", require("./routes/questionnaireRoutes"));
-app.use("/api/questionnaires", require("./routes/questionRoutes"));
+const questionnaireRoutes = require("./routes/questionnaireRoutes");
+const questionRoutes = require("./routes/questionRoutes");
 
-// Afficher les routes chargées (en utilisant app._router)
-app._router.stack.forEach((middleware) => {
-  if (middleware.route && middleware.route.path) {
-    console.log("Route chargée:", middleware.route.path);
-  }
-});
+app.use("/api/questionnaires", questionnaireRoutes);
+app.use("/api/questionnaires", questionRoutes);
 
-const PORT = process.env.PORT || 5001;
-app.listen(PORT, () => console.log(`Serveur démarré sur le port ${PORT}`));
+// Afficher les routes chargées proprement
+if (app._router) {
+  app._router.stack.forEach((middleware) => {
+    if (middleware.route) {
+      console.log("✅ Route chargée :", middleware.route.path);
+    }
+  });
+}
+
+// Ne démarre le serveur que si ce n'est pas un test Jest
+if (process.env.NODE_ENV !== "test") {
+  const PORT = process.env.PORT || 5001;
+  app.listen(PORT, () => console.log(`Serveur démarré sur le port ${PORT}`));
+}
 
 module.exports = app;
