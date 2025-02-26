@@ -8,12 +8,14 @@ connectDB();
 
 const app = express();
 
-// ✅ Configuration CORS corrigée
+// ✅ Configuration CORS mise à jour
 const allowedOrigins = ["https://victoireondelet.site", "https://www.victoireondelet.site"];
+
 app.use((req, res, next) => {
     const origin = req.headers.origin;
     if (allowedOrigins.includes(origin)) {
         res.setHeader("Access-Control-Allow-Origin", origin); // ✅ Une seule origine
+        res.setHeader("Vary", "Origin"); // ✅ Permet au navigateur de gérer plusieurs origines
         res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
         res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
         res.setHeader("Access-Control-Allow-Credentials", "true");
