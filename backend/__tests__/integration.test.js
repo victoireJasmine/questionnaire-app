@@ -1,22 +1,19 @@
-const request = require("supertest");
 const mongoose = require("mongoose");
-const { MongoMemoryServer } = require("mongodb-memory-server");
+const request = require("supertest");
+const { MongoMemoryServer } = require("mongodb-memory-server-core");
 const app = require("../server");
 
-let mongoServer;
+jest.setTimeout(30000); // Augmente le timeout global (MongoMemoryServer peut être lent)
 
-jest.setTimeout(30000); // Augmenter le timeout des tests
+let mongoServer;
 
 beforeAll(async () => {
   mongoServer = await MongoMemoryServer.create();
   const mongoUri = mongoServer.getUri();
 
-  // Ferme la connexion existante pour éviter les erreurs
-  if (mongoose.connection.readyState === 1) {
-    await mongoose.connection.close();
+  if (mongoose.connection.readyState === 0) {
+    await mongoose.connect(mongoUri, { dbName: "test" });
   }
-
-  await mongoose.connect(mongoUri, { dbName: "test" });
 });
 
 afterAll(async () => {
@@ -27,8 +24,10 @@ afterAll(async () => {
 
 describe("🛠️ Integration Tests - Questionnaire API", () => {
   test("✅ GET /api/questionnaires/questionnaire - Récupérer tous les questionnaires", async () => {
-    const response = await request(app).get("/api/questionnaires/questionnaire");
-    expect(response.status).toBe(200);
+    const response = await request(app)
+      .get("/api/questionnaires/questionnaire")
+      .expect(200);
+
     expect(Array.isArray(response.body)).toBe(true);
   });
 });
