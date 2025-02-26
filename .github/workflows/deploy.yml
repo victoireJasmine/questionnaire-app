@@ -6,9 +6,9 @@ on:
       - main
 
 jobs:
-  # ✅ Test Backend (Jest)
+  # ✅ Test d'intégration du backend (Jest + Supertest)
   test_backend:
-    name: Run Backend Unit Tests
+    name: Run Backend Integration Tests
     runs-on: ubuntu-latest
 
     steps:
@@ -20,21 +20,27 @@ jobs:
         with:
           node-version: 18
 
-      - name: Install dependencies
+      - name: Install backend dependencies
         run: |
           cd backend
           npm install
-          npx jest --version  # Vérifie que Jest est bien installé
+          npx jest --version  # Vérifie que Jest est installé
 
       - name: Fix Jest Permissions
         run: chmod +x backend/node_modules/.bin/jest  # Corrige l'erreur "Permission denied"
 
-      - name: Run unit tests (Jest)
+      - name: Start Backend for Integration Tests
         run: |
           cd backend
-          npx jest --runInBand
+          npm run start &  # Lancer le backend en arrière-plan
+          sleep 5  # Attendre que le serveur démarre
 
-  # ✅ Test Frontend (Vitest)
+      - name: Run Backend Integration Tests
+        run: |
+          cd backend
+          npx jest __tests__/integration.test.js --runInBand  # Lancer les tests Jest d'intégration
+
+  # ✅ Test unitaire du frontend (Vitest)
   test_frontend:
     name: Run Frontend Unit Tests
     runs-on: ubuntu-latest
@@ -48,22 +54,22 @@ jobs:
         with:
           node-version: 18
 
-      - name: Install dependencies
+      - name: Install frontend dependencies
         run: |
           cd frontend
           npm install
-          npx vitest --version  # Vérifie que Vitest est bien installé
+          npx vitest --version  # Vérifie que Vitest est installé
 
-      - name: Run unit tests (Vitest)
+      - name: Run Frontend Unit Tests
         run: |
           cd frontend
           npm run test
 
-  # ✅ Déploiement sur Scaleway
+  # ✅ Déploiement sur Scaleway après tests réussis
   deploy:
     name: Deploy to Scaleway
     runs-on: ubuntu-latest
-    needs: [test_backend, test_frontend]  # Attends que les tests passent avant de déployer
+    needs: [test_backend, test_frontend]  # Déploiement uniquement si les tests réussissent
 
     steps:
       - name: Checkout repository
