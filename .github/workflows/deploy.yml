@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  # ✅ Test d'intégration du backend (Jest + Supertest)
+  # Test d'intégration du backend (Jest + Supertest)
   test_backend:
     name: Run Backend Integration Tests
     runs-on: ubuntu-latest
@@ -40,7 +40,7 @@ jobs:
           export NODE_ENV=test 
           npm test -- --runInBand --forceExit --detectOpenHandles
 
-  # ✅ Test unitaire du frontend (Vitest)
+  # Test unitaire du frontend (Vitest)
   test_frontend:
     name: Run Frontend Unit Tests
     runs-on: ubuntu-latest
@@ -64,7 +64,7 @@ jobs:
           cd frontend
           npm test
 
-  # ✅ Déploiement sur Scaleway après tests réussis
+  # Déploiement sur Scaleway après tests réussis
   deploy:
     name: Deploy to Scaleway
     runs-on: ubuntu-latest
@@ -86,14 +86,21 @@ jobs:
       - name: Deploy to server
         run: |
           ssh ${{ secrets.SCALEWAY_USER }}@${{ secrets.SCALEWAY_HOST }} <<EOF
-            set -e  # Arrête le script en cas d'erreur
+            set -e  # Arrêter le script en cas d'erreur
             cd ~/questionnaire-app
-            git reset --hard origin/main  # Supprime les changements locaux
-            git pull origin main  # Récupère les dernières modifications
+            git reset --hard origin/main  # Supprimer les changements locaux
+            git pull origin main  # Récupérer les dernières modifications
+
+            # Arrêter et nettoyer les anciens conteneurs
             sudo docker compose down
-            sudo docker system prune -af  # Nettoie les anciens conteneurs/images
-            sudo docker compose build --no-cache frontend  # Rebuild complet du frontend
-            sudo docker compose up -d --build
-            sudo systemctl restart nginx  # Redémarre Nginx
+            sudo docker system prune -af  # Supprime tout le cache Docker
+
+            # Rebuild total pour éviter les erreurs de cache
+            sudo docker compose build --no-cache
+
+            # Relancer les services
+            sudo docker compose up -d
+            sudo systemctl restart nginx  # Redémarrer Nginx
             exit
           EOF
+
