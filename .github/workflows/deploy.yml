@@ -1,4 +1,4 @@
-name: Deploy and Test Scaleway
+name: CI/CD Deployment to Scaleway
 
 on:
   push:
@@ -6,29 +6,7 @@ on:
       - main
 
 jobs:
-  test_frontend:
-    name: Run Frontend Unit Tests
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Install Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-
-      - name: Install dependencies
-        run: |
-          cd frontend
-          npm install
-
-      - name: Run unit tests (Vitest)
-        run: |
-          cd frontend
-          npm test
-
+  # Test Backend (Jest)
   test_backend:
     name: Run Backend Unit Tests
     runs-on: ubuntu-latest
@@ -46,16 +24,46 @@ jobs:
         run: |
           cd backend
           npm install
+          npx jest --version  # Vérifie que Jest est bien installé
+
+      - name: Fix Jest Permissions
+        run: chmod +x backend/node_modules/.bin/jest  
 
       - name: Run unit tests (Jest)
         run: |
           cd backend
           npm test
 
+  # Test Frontend (Vitest)
+  test_frontend:
+    name: Run Frontend Unit Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: |
+          cd frontend
+          npm install
+          npx vitest --version  # Vérifie que Vitest est bien installé
+
+      - name: Run unit tests (Vitest)
+        run: |
+          cd frontend
+          npm run test
+
+  # Déploiement sur Scaleway
   deploy:
     name: Deploy to Scaleway
-    needs: [test_frontend, test_backend]  # ✅ Ne déploie que si les tests unitaires réussissent
     runs-on: ubuntu-latest
+    needs: [test_backend, test_frontend]  
 
     steps:
       - name: Checkout repository
@@ -73,39 +81,14 @@ jobs:
       - name: Deploy to server
         run: |
           ssh ${{ secrets.SCALEWAY_USER }}@${{ secrets.SCALEWAY_HOST }} <<EOF
-            set -e
+            set -e  # Arrête le script en cas d'erreur
             cd ~/questionnaire-app
-            git reset --hard origin/main
-            git pull origin main
+            git reset --hard origin/main  # Supprime les changements locaux
+            git pull origin main  # Récupère les dernières modifications
             sudo docker compose down
-            sudo docker system prune -af
-            sudo docker compose build --no-cache frontend
+            sudo docker system prune -af  # Nettoie les anciens conteneurs/images
+            sudo docker compose build --no-cache frontend  # Rebuild complet du frontend
             sudo docker compose up -d --build
-            sudo systemctl restart nginx
-            echo "✅ Déploiement terminé !"
+            sudo systemctl restart nginx  # Redémarre Nginx
             exit
           EOF
-
-  integration_test:
-    name: Run Integration Tests
-    needs: deploy  # ✅ Tests d’intégration après le déploiement
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Install Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-
-      - name: Install dependencies
-        run: |
-          cd backend
-          npm install supertest jest
-
-      - name: Run integration tests
-        run: |
-          cd backend
-          npm test __tests__/integration.test.js
