@@ -6,11 +6,9 @@ on:
       - main
 
 jobs:
-  # 🚀 Test unitaire du frontend (Vitest)
+  # ✅ Tests unitaires du frontend
   test_frontend:
-    name: Run Frontend Unit Tests
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -31,10 +29,39 @@ jobs:
           cd frontend
           npm run test
 
-  # 🚀 Déploiement sur Scaleway (uniquement si les tests du frontend passent)
+  # ✅ Tests d'intégration backend
+  test_backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install backend dependencies
+        run: |
+          cd backend
+          npm install
+          npx jest --version  # Vérifie que Jest est installé
+
+      - name: Start Backend for Integration Tests
+        run: |
+          cd backend
+          npm run start &  # Lancer le backend en arrière-plan
+          sleep 5  # Attendre que le serveur démarre
+
+      - name: Run Backend Integration Tests
+        run: |
+          cd backend
+          npx jest __tests__/integration.test.js --runInBand  # Lancer les tests Jest d'intégration
+
+  # ✅ Déploiement uniquement si les tests réussissent
   deploy:
     runs-on: ubuntu-latest
-    needs: [test_frontend]  # Bloque le déploiement si les tests échouent
+    needs: [test_frontend, test_backend]  # Ne déploie que si les tests passent
 
     steps:
       - name: Checkout repository
