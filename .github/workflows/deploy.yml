@@ -7,7 +7,6 @@ on:
 
 jobs:
   deploy:
-    name: Deploy to Scaleway
     runs-on: ubuntu-latest
 
     steps:
@@ -17,7 +16,7 @@ jobs:
       - name: Set up SSH
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SCALEWAY_SSH_KEY }}" > ~/.ssh/id_ed25519
+          echo "${{ secrets.SCALEWAY_SSH_KEY }}" | tr -d '\r' > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
           eval "$(ssh-agent -s)"
           ssh-add ~/.ssh/id_ed25519
@@ -26,32 +25,10 @@ jobs:
       - name: Deploy to server
         run: |
           ssh ${{ secrets.SCALEWAY_USER }}@${{ secrets.SCALEWAY_HOST }} <<EOF
-            set -e  # Stop script if any command fails
-
-            echo "🚀 Déploiement en cours sur Scaleway..."
-
-            # Aller dans le dossier du projet
             cd ~/questionnaire-app
-
-            # Récupérer les dernières modifications du repo
-            git reset --hard origin/main  # Supprime les changements locaux
-            git pull origin main  # Récupère les dernières modifications
-
-            # Arrêter l'ancienne version du backend & frontend sans supprimer les volumes
+            git pull origin main
             sudo docker compose down
-
-            # Nettoyage des images inutilisées pour éviter les conflits
-            sudo docker system prune -af --volumes
-
-            # Rebuild du projet sans supprimer les volumes MongoDB
-            sudo docker compose build --no-cache
-
-            # Démarrer les nouveaux services
             sudo docker compose up -d --build
-
-            # Assurer que MongoDB et Nginx redémarrent bien
             sudo systemctl restart nginx
-
-            echo "✅ Déploiement terminé avec succès !"
             exit
           EOF
