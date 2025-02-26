@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  # ✅ Test d'intégration du backend (Jest + Supertest)
+  # 🔍 Test d'intégration du backend (Jest + Supertest)
   test_backend:
     name: Run Backend Integration Tests
     runs-on: ubuntu-latest
@@ -24,23 +24,16 @@ jobs:
         run: |
           cd backend
           npm install
-          npx jest --version  # Vérifie que Jest est installé
 
       - name: Fix Jest Permissions
-        run: chmod +x backend/node_modules/.bin/jest  # Corrige l'erreur "Permission denied"
-
-      - name: Start Backend for Integration Tests
-        run: |
-          cd backend
-          npm run start &  # Lancer le backend en arrière-plan
-          sleep 5  # Attendre que le serveur démarre
+        run: chmod +x backend/node_modules/.bin/jest
 
       - name: Run Backend Integration Tests
         run: |
           cd backend
-          npx jest __tests__/integration.test.js --runInBand  # Lancer les tests Jest d'intégration
+          npm test -- --runInBand --forceExit --detectOpenHandles
 
-  # ✅ Test unitaire du frontend (Vitest)
+  # 🔬 Test unitaire du frontend (Vitest)
   test_frontend:
     name: Run Frontend Unit Tests
     runs-on: ubuntu-latest
@@ -58,18 +51,17 @@ jobs:
         run: |
           cd frontend
           npm install
-          npx vitest --version  # Vérifie que Vitest est installé
 
       - name: Run Frontend Unit Tests
         run: |
           cd frontend
-          npm run test
+          npm test
 
-  # ✅ Déploiement sur Scaleway après tests réussis
+  # 🚀 Déploiement sur Scaleway après succès des tests
   deploy:
     name: Deploy to Scaleway
     runs-on: ubuntu-latest
-    needs: [test_backend, test_frontend]  # Déploiement uniquement si les tests réussissent
+    needs: [test_backend, test_frontend]  # Le déploiement ne se fait que si les tests passent
 
     steps:
       - name: Checkout repository
@@ -87,7 +79,7 @@ jobs:
       - name: Deploy to server
         run: |
           ssh ${{ secrets.SCALEWAY_USER }}@${{ secrets.SCALEWAY_HOST }} <<EOF
-            set -e  # Arrête le script en cas d'erreur
+            set -e  # Arrête immédiatement en cas d'erreur
             cd ~/questionnaire-app
             git reset --hard origin/main  # Supprime les changements locaux
             git pull origin main  # Récupère les dernières modifications

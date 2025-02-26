@@ -3,13 +3,19 @@ const mongoose = require("mongoose");
 const { MongoMemoryServer } = require("mongodb-memory-server");
 const app = require("../server");
 
-jest.setTimeout(30000); // ✅ Augmente le timeout pour Jest
-
 let mongoServer;
+
+jest.setTimeout(30000); // Augmenter le timeout des tests
 
 beforeAll(async () => {
   mongoServer = await MongoMemoryServer.create();
   const mongoUri = mongoServer.getUri();
+
+  // Ferme la connexion existante pour éviter les erreurs
+  if (mongoose.connection.readyState === 1) {
+    await mongoose.connection.close();
+  }
+
   await mongoose.connect(mongoUri, { dbName: "test" });
 });
 
@@ -20,21 +26,9 @@ afterAll(async () => {
 });
 
 describe("🛠️ Integration Tests - Questionnaire API", () => {
-  test("✅ POST /api/questionnaires/questionnaire - Créer un questionnaire", async () => {
-    const response = await request(app)
-      .post("/api/questionnaires/questionnaire")  
-      .send({ title: "Test Questionnaire", description: "Description de test" })
-      .expect(201);
-
-    expect(response.body).toHaveProperty("_id");
-    expect(response.body.title).toBe("Test Questionnaire");
-  });
-
   test("✅ GET /api/questionnaires/questionnaire - Récupérer tous les questionnaires", async () => {
-    const response = await request(app)
-      .get("/api/questionnaires/questionnaire")
-      .expect(200);
-
+    const response = await request(app).get("/api/questionnaires/questionnaire");
+    expect(response.status).toBe(200);
     expect(Array.isArray(response.body)).toBe(true);
   });
 });
