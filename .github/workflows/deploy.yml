@@ -1,4 +1,4 @@
-name: Deploy to Scaleway
+name: Deploy and Test Scaleway
 
 on:
   push:
@@ -6,7 +6,55 @@ on:
       - main
 
 jobs:
+  test_frontend:
+    name: Run Frontend Unit Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: |
+          cd frontend
+          npm install
+
+      - name: Run unit tests (Vitest)
+        run: |
+          cd frontend
+          npm test
+
+  test_backend:
+    name: Run Backend Unit Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: |
+          cd backend
+          npm install
+
+      - name: Run unit tests (Jest)
+        run: |
+          cd backend
+          npm test
+
   deploy:
+    name: Deploy to Scaleway
+    needs: [test_frontend, test_backend]  # ✅ Ne déploie que si les tests unitaires réussissent
     runs-on: ubuntu-latest
 
     steps:
@@ -25,12 +73,39 @@ jobs:
       - name: Deploy to server
         run: |
           ssh ${{ secrets.SCALEWAY_USER }}@${{ secrets.SCALEWAY_HOST }} <<EOF
+            set -e
             cd ~/questionnaire-app
+            git reset --hard origin/main
             git pull origin main
             sudo docker compose down
-            sudo docker system prune -af  # Supprime tout le cache Docker
-            sudo docker compose build --no-cache frontend  # Rebuild complet du frontend
+            sudo docker system prune -af
+            sudo docker compose build --no-cache frontend
             sudo docker compose up -d --build
             sudo systemctl restart nginx
+            echo "✅ Déploiement terminé !"
             exit
           EOF
+
+  integration_test:
+    name: Run Integration Tests
+    needs: deploy  # ✅ Tests d’intégration après le déploiement
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: |
+          cd backend
+          npm install supertest jest
+
+      - name: Run integration tests
+        run: |
+          cd backend
+          npm test __tests__/integration.test.js
