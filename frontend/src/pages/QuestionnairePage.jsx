@@ -27,7 +27,7 @@ const QuestionnairePage = () => {
   return (
     <div className="w-full min-h-screen relative flex flex-col items-center justify-center">
       {/* Bouton retour en haut à gauche */}
-      <Link to="/" className="absolute top-4 left-4 text-gray-600 hover:text-gray-800 text-2xl">
+      <Link to="/questionnaire" className="absolute top-4 left-4 text-gray-600 hover:text-gray-800 text-2xl">
         ← retour
       </Link>
 
