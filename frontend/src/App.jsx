@@ -8,8 +8,8 @@ function App() {
   return (
     <Router>
       <Routes>
-      <Route path="/admin-auth" element={<AdminAuthPage />} />
-        <Route path="/" element={<Home />} />
+      <Route path="/" element={<AdminAuthPage />} />
+        <Route path="/questionnaire" element={<Home />} />
         <Route path="/questionnaire/:id" element={<QuestionnaireDetail />} />
         <Route path="/questionnaire/create" element={<QuestionnairePage />} />
       </Routes>

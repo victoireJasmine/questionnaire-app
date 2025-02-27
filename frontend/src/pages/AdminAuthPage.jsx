@@ -25,7 +25,7 @@ const AdminAuthPage = () => {
 
       localStorage.setItem("adminToken", data.token);
       console.log("Connexion réussie !");
-      navigate("/"); // 🔥 Redirection vers la liste des questionnaires
+      navigate("/questionnaire"); 
     } catch (error) {
       console.error(error);
       setError("Erreur d'authentification. Vérifiez vos identifiants.");
