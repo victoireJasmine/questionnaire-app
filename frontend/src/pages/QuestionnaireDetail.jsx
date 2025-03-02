@@ -98,7 +98,7 @@ const QuestionnaireDetail = () => {
             options={[
               { value: "text", label: "Texte" },
               { value: "multiple-choice", label: "Choix multiple" },
-              { value: "checkbox", label: "Case à cocher" }
+              { value: "boolean", label: "Vrai ou faux" }
             ]}
           />
         </div>
