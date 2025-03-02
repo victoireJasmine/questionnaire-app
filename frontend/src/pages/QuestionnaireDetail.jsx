@@ -72,43 +72,46 @@ const QuestionnaireDetail = () => {
   };
 
   return (
-    <div className="max-w-lg mx-auto p-6 bg-gray-50 min-h-screen">
-      {/* Formulaire pour ajouter une nouvelle question */}
+    <div className="mx-auto p-6 bg-gray-50 min-h-screen">
+      
       <h1 className="text-2xl font-bold text-center mb-6 text-gray-800">
-        📌 Add a Question
+        Ajouter une question
       </h1>
       <form onSubmit={handleAddQuestion} className="w-full max-w-sm mx-auto">
-        <div className="flex flex-col border-b border-teal-500 py-2">
-          <input
-            className="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-2 px-3 leading-tight focus:outline-none"
+        <div className="flex flex-col">
+
+          <InputField
+            label="Question"
             type="text"
-            placeholder="Enter a question"
+            placeholder="Entrer la question"
             value={newQuestionText}
             onChange={(e) => setNewQuestionText(e.target.value)}
             required
           />
         </div>
-        <div className="flex flex-col border-b border-teal-500 py-2 mt-4">
-          <select
+        <div className="flex flex-col py-2 mt-4">
+          <InputField 
+            label="Type de question"
+            type="select"
             value={newQuestionType}
             onChange={(e) => setNewQuestionType(e.target.value)}
-            className="appearance-none bg-transparent border-none w-full text-gray-700 py-2 px-3 leading-tight focus:outline-none"
-          >
-            <option value="text">Text</option>
-            <option value="multiple-choice">Multiple Choice</option>
-            <option value="boolean">True/False</option>
-          </select>
+            options={[
+              { value: "text", label: "Texte" },
+              { value: "multiple-choice", label: "Choix multiple" },
+              { value: "checkbox", label: "Case à cocher" }
+            ]}
+          />
         </div>
 
         {/* Champs spécifiques lors de la création d'une question */}
         {newQuestionType === "text" && (
           <div className="mt-4">
-            <label className="block text-gray-700 mb-2">Réponse attendue</label>
-            <input
+            <InputField
+              label="Réponse"
               type="text"
               value={expectedAnswer}
               onChange={(e) => setExpectedAnswer(e.target.value)}
-              placeholder="Enter expected answer"
+              placeholder="Entrer une reponse attendue"
               className="w-full border p-2 rounded"
             />
           </div>
@@ -143,21 +146,19 @@ const QuestionnaireDetail = () => {
 
         {newQuestionType === "multiple-choice" && (
           <div className="mt-4">
-            <label className="block text-gray-700 mb-2">
-              Réponses possibles
-            </label>
-            <div className="flex">
-              <input
+            <div className="flex gap-2">
+              <InputField
+                label="Réponse"
                 type="text"
                 value={newAnswer}
                 onChange={(e) => setNewAnswer(e.target.value)}
-                placeholder="Enter answer option"
+                placeholder="Entrer choix reponse"
                 className="w-full border p-2 rounded-l"
               />
               <button
                 type="button"
                 onClick={handleAddAnswer}
-                className="bg-teal-500 hover:bg-teal-700 text-white px-4 rounded-r"
+                className="inline-block bg-teal-500 text-white py-1 px-5 rounded-lg shadow-md hover:bg-blue-600 transition"
               >
                 Ajouter
               </button>
@@ -174,12 +175,12 @@ const QuestionnaireDetail = () => {
           </div>
         )}
 
-        <div className="flex justify-center mt-4">
+        <div className="flex justify-center mt-12">
           <button
-            className="bg-teal-500 hover:bg-teal-700 border-teal-500 hover:border-teal-700 py-2 px-4 rounded font-semibold"
+            className="inline-block bg-teal-500 text-white py-3 px-5 rounded-lg shadow-md hover:bg-blue-600 transition"
             type="submit"
           >
-            Add
+            Ajouter 
           </button>
         </div>
       </form>

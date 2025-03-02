@@ -26,7 +26,7 @@ const QuestionnairePage = () => {
 
   return (
     <div className="w-full min-h-screen relative flex flex-col items-center justify-center">
-      {/* Bouton retour en haut à gauche */}
+     
       <Link to="/questionnaire" className="absolute top-4 left-4 text-gray-600 hover:text-gray-800 text-2xl">
         ← retour
       </Link>
@@ -52,7 +52,7 @@ const QuestionnairePage = () => {
           onChange={(e) => setDescription(e.target.value)}
         />
 
-        {/* Bouton Create centré */}
+        
         <div className="flex justify-center mt-4">
           <button
             className="inline-block bg-teal-500 text-white py-3 px-5 rounded-lg shadow-md hover:bg-blue-600 transition"
