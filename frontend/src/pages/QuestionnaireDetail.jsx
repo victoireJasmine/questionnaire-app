@@ -117,33 +117,6 @@ const QuestionnaireDetail = () => {
           </div>
         )}
 
-        {newQuestionType === "boolean" && (
-          <div className="mt-4 flex space-x-4">
-            <label className="flex items-center">
-              <input
-                type="radio"
-                name="boolean"
-                value="true"
-                checked={selectedBoolean === "true"}
-                onChange={(e) => setSelectedBoolean(e.target.value)}
-                className="mr-2"
-              />
-              Vrai
-            </label>
-            <label className="flex items-center">
-              <input
-                type="radio"
-                name="boolean"
-                value="false"
-                checked={selectedBoolean === "false"}
-                onChange={(e) => setSelectedBoolean(e.target.value)}
-                className="mr-2"
-              />
-              Faux
-            </label>
-          </div>
-        )}
-
         {newQuestionType === "multiple-choice" && (
           <div className="mt-4">
             <div className="flex gap-2">
