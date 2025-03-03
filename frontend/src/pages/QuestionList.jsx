@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { fetchQuestions } from "../services/api";
 import InputField from "../components/InputField";
+
 const QuestionList = () => {
   const { id } = useParams();
   const [questions, setQuestions] = useState([]);
@@ -23,7 +24,7 @@ const QuestionList = () => {
 
   return (
     <div className="mx-auto p-6 min-h-screen">
-      <Link to="/questionnaire" className=" text-gray-600 hover:text-gray-800 text-2xl">
+      <Link to={`/questionnaire`} className=" text-gray-600 hover:text-gray-800 text-2xl">
         ← Retour
       </Link>
 
@@ -65,6 +66,7 @@ const QuestionList = () => {
           </li>
         ))}
       </ul>
+
       <Link to={`/questionnaire/${id}/add`} className="bg-teal-500 text-white px-4 py-2 rounded-lg">
         Ajouter une question
       </Link>
